@@ -23,61 +23,37 @@ func main() {
 	}
 
 	scanner := bufio.NewScanner(bytes)
-	var data []string
-	for scanner.Scan() {
-		data = append(data, scanner.Text())
-	}
-
 	var claimsArr []claim
-	var cleanArr = make(map[string]int)
 	var mapa [1000][1000]int
-	for i := 0; i < len(data); i++ {
-		lineaParseada := parseLine(data[i])
-		claimsArr = append(claimsArr, lineaParseada)
+	for scanner.Scan() {
+		claimsArr = append(claimsArr, parseLine(scanner.Text()))
 	}
 
 	for _, rect := range claimsArr {
 		for i := rect.x; i < rect.x+rect.width; i++ {
 			for j := rect.y; j < rect.y+rect.heigth; j++ {
 				mapa[i][j]++
-				cleanArr[rect.id] = mapa[i][j]
 			}
 		}
 	}
 
-	// conflicts := countConflicts(mapa)
-
-	fmt.Println("clean claims", getCleanClaim(cleanArr))
+	for _, claim := range claimsArr {
+		if isCleanClaim(mapa, claim) {
+			fmt.Println("Clean Claim found: ", claim.id)
+		}
+	}
 }
 
-func getCleanClaim(arr map[string]int) string {
-	var found string
-	for key, _ := range arr {
-		if arr[key] == 1 {
-			found = key
-			fmt.Println("Found", found)
-			os.Exit(0)
+func isCleanClaim(arr [1000][1000]int, claim claim) bool {
+	for i := claim.x; i < claim.x+claim.width; i++ {
+		for j := claim.y; j < claim.y+claim.heigth; j++ {
+			if arr[i][j] > 1 {
+				return false
+			}
 		}
 	}
 
-	return found
-}
-
-// func countConflicts(mapa [1000][1000]int) int {
-// 	conflicts := 0
-// 	for _, arr := range mapa {
-// 		for _, value := range arr {
-// 			if value > 1 {
-// 				conflicts++
-// 			}
-// 		}
-// 	}
-
-// 	return conflicts
-// }
-
-func removeIndex(s []int, index int) []int {
-	return append(s[:index], s[index+1:]...)
+	return true
 }
 
 func parseLine(line string) claim {
