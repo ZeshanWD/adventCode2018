@@ -11,7 +11,7 @@ import (
 
 type timestamp struct {
 	year   int
-	mont   int
+	month  int
 	day    int
 	hour   int
 	minute int
@@ -35,10 +35,12 @@ func main() {
 	}
 
 	sort.Strings(lines) // sort chronologically
+
 	var registroMapa = make(map[string][]sleepRegistry)
 	var currentGuard string
 	var sleepStart int
 	var sleepEnd int
+	var sleepStartSet, sleepEndSet bool
 	for _, value := range lines {
 		time := parseLine(value)
 		message := value[19:]
@@ -46,23 +48,21 @@ func main() {
 
 		if messageDestructuring[0] == "Guard" {
 			currentGuard = messageDestructuring[1][1:]
-		}
-
-		if strings.Join(messageDestructuring, " ") == "falls asleep" {
+		} else if strings.Trim(strings.Join(messageDestructuring, " "), " ") == "falls asleep" {
 			sleepStart = time.minute
-		}
-
-		if strings.Join(messageDestructuring, " ") == "wakes up" {
+			sleepStartSet = true
+		} else if strings.Trim(strings.Join(messageDestructuring, " "), " ") == "wakes up" {
 			sleepEnd = time.minute - 1
+			sleepEndSet = true
 		}
 
-		if sleepStart > 0 && sleepEnd > 0 {
+		if sleepStartSet && sleepEndSet && len(currentGuard) > 0 {
 			registroMapa[currentGuard] = append(registroMapa[currentGuard], sleepRegistry{
 				sleepStart,
 				sleepEnd,
 			})
-			sleepStart = 0
-			sleepEnd = 0
+			sleepStartSet = false
+			sleepEndSet = false
 		}
 	}
 
@@ -144,8 +144,6 @@ func parseLine(row string) (parsedLine timestamp) {
 		}
 	})
 
-	fmt.Println()
-
 	return timestamp{
 		parseToInt(date[0]),
 		parseToInt(date[1]),
@@ -153,6 +151,7 @@ func parseLine(row string) (parsedLine timestamp) {
 		parseToInt(time[0]),
 		parseToInt(time[1]),
 	}
+
 }
 
 func parseToInt(value string) int {

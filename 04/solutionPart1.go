@@ -11,7 +11,7 @@ import (
 
 type timestamp struct {
 	year   int
-	mont   int
+	month  int
 	day    int
 	hour   int
 	minute int
@@ -145,8 +145,6 @@ func parseLine(row string) (parsedLine timestamp) {
 			return false
 		}
 	})
-
-	fmt.Println()
 
 	return timestamp{
 		parseToInt(date[0]),
