@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	bytes, err := os.Open("test.txt")
+	bytes, err := os.Open("input.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -28,31 +28,31 @@ func getMinimumLengthPolymer(cadenaPolimero string) int {
 	var stringWithRemovedChar string
 	var fullyReactedString string
 	lettersMap := map[string]int{}
+
 	for _, value := range cadenaPolimero {
-		fmt.Println("letter", string(value))
+		fmt.Println("char", string(value))
 		stringWithRemovedChar = removeCharactersFromString(string(value), cadenaPolimero)
-		// fmt.Println("removed Letter string", stringWithRemovedChar)
 		fullyReactedString = getResultPolymer(stringWithRemovedChar)
-		lettersMap[string(value)] = len(fullyReactedString)
+		lettersMap[strings.ToLower(string(value))] = len(fullyReactedString)
 	}
 
 	fmt.Println("Mapa", lettersMap)
 
-	return getMaxLength(lettersMap)
+	return getMinLength(lettersMap)
 }
 
 func removeCharactersFromString(character string, cadena string) string {
 	var newString string
-	fmt.Println("previous", cadena)
+
 	newString = strings.Replace(cadena, strings.ToUpper(string(character)), "", -1)
-	newString = strings.Replace(cadena, strings.ToLower(string(character)), "", -1)
-	fmt.Println("after", newString)
+	newString = strings.Replace(newString, strings.ToLower(string(character)), "", -1)
+
 	return newString
 }
 
-func getMaxLength(mapa map[string]int) int {
+func getMinLength(mapa map[string]int) int {
 	var maxKey string
-	var maxLength int
+	maxLength := 250
 	for key, value := range mapa {
 		if value < maxLength {
 			maxLength = value
@@ -60,7 +60,6 @@ func getMaxLength(mapa map[string]int) int {
 		}
 	}
 	fmt.Println("maxKey", maxKey)
-	fmt.Println("maxLentgh", maxLength)
 	return maxLength
 }
 
